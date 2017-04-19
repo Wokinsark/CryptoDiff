@@ -1,9 +1,12 @@
 #include <QDebug>
 #include <QCoreApplication>
+#include <QList>
+#include <QString>
+#include <cmath>
 
 typedef unsigned char byte;
 
-#define CONST 0.00390625 // 1/2^8
+#define CONST 0.00390625 // 1/(2^8)
 
 constexpr byte sboxBelT[256] = {
     0xB1, 0x94, 0xBA, 0xC8, 0x0A, 0x08, 0xF5, 0x3B, 0x36, 0x6D, 0x00, 0x8E, 0x58, 0x4A, 0x5D, 0xE4,
@@ -40,28 +43,58 @@ const byte XOR(const byte& a, const byte& b){
     return (byte)(a ^ b);
 }
 
-const bool isEqual(const byte& a, const byte& b){
-    return a == b;
+const bool isEqual(const byte& a, const byte& b){    
+    return (bool)(a == b);
 }
 
-double getValuePlus() {
+const double getValue(const byte (*pfunc)(const byte& alfa, const byte& betta), const byte& alfa, const byte& betta){
     int count = 0;
-    for(int alfa = 0; alfa < 256; alfa++) {
-        for(int betta = 0; betta < 256; betta++) {
-            for(int k = 0; k < 256; k++) {
-                count += isEqual(plus( H( plus(k, alfa) ), H(k) ), betta);
+    for(int k = 0; k < 256; k++) {
+        count += isEqual(pfunc( H( plus(k, alfa) ), H(k) ), betta);
+    }
+    return count * CONST;
+}
+
+void getValues(const QString operationName, const byte (*pfunc)(const byte& alfa, const byte& betta)){
+    QList<QPair<byte, byte>> maxValues;
+    double max = 0.0;
+    for(int alfa = 1; alfa < 256; alfa++) {
+        for(int betta = 1; betta < 256; betta++) {
+            const double value = getValue(pfunc, alfa, betta);
+            if(value > max){
+                max      = value;
+                maxValues.clear();
+            }
+
+            if(value == max){
+                QPair<double, double> ab;
+                ab.first  = alfa;
+                ab.second = betta;
+
+                maxValues.append(ab);
             }
         }
     }
 
-    return count;
+    qDebug() << QString("*** %1 ***").arg(operationName);
+    qDebug() << "\nМАКСИМУМ " << max << "\n";
+    qDebug() << QString("Это приблизительно соответствует 2 в %1 степени").arg(-log2(1.0 / max));
+    qDebug() << "Всего максимумов " << maxValues.count();
+    qDebug() << "Значения при которых был максимум " << max << "\n";
+    for(QPair<byte, byte> ab : maxValues){
+        qDebug() << "Альфа: " << ab.first;
+        qDebug() << "Бетта: " << ab.second << "\n";
+    }
+    qDebug() << "\n";
 }
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    byte b = 0x01;
-    byte c = 0x02;
-    qDebug() << getValuePlus();
+
+    getValues("СЛОЖЕНИЕ",  plus);
+    getValues("ВЫЧИТАНИЕ", minus);
+    getValues("ПОРАЗРЯДНОЕ СЛОЖЕНИЕ", XOR);
+
     return a.exec();
 }
