@@ -4,14 +4,14 @@
 
 #include "sbox.h"
 
-SBox::SBox() : m_sbox(nullptr)
+SBox::SBox() : m_sbox(nullptr), m_fixedpoint(0)
 {
 
 }
 
 void SBox::generation()
 {
-    generate(&m_sbox);
+    generate(m_sbox);
 }
 
 void SBox::calculation()
@@ -53,32 +53,44 @@ void SBox::calculation()
     res = getValues(XOR, XOR);
     m_max.xorXOR = res.first;
     m_avr.xorXOR = res.second;
+
+    m_fixedpoint = 0;
+    for(int i = 0; i < 256; i++){
+        if(m_sbox[i] == H(m_sbox[i])){
+            m_fixedpoint++;
+        }
+    }
 }
 
-SBox::RESULT SBox::getValuesMAX()
+const SBox::RESULT SBox::getValuesMAX() const
 {
     return m_max;
 }
 
-SBox::RESULT SBox::getValuesAVR()
+const SBox::RESULT SBox::getValuesAVR() const
 {
     return m_avr;
 }
 
-void SBox::generate(byte **sbox)
+const int SBox::getFixedPoint() const
 {
-    if(sbox && (* sbox)){
-        delete[] (* sbox);
+    return m_fixedpoint;
+}
+
+void SBox::generate(byte *& sbox)
+{
+    if(sbox){
+        delete[] (sbox);
     }
 
-    * sbox = new byte[256];
+    sbox = new byte[256];
     for(int i = 0; i < 256; i++){
-        (* sbox)[i] = i;
+        (sbox)[i] = i;
     }
 
     qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
     for(int i = 255; i > 0; i--){
-        std::swap((* sbox)[i], (* sbox)[qrand() % i]);
+        std::swap((sbox)[i], (sbox)[qrand() % i]);
     }
 }
 

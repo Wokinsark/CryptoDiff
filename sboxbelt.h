@@ -9,7 +9,7 @@ public:
     SBoxBelT();
 
 protected:
-    void generate(byte ** sbox);
+    void generate(byte *& sbox);
 };
 
 #endif // SBOXBELT_H

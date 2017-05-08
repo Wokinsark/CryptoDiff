@@ -28,12 +28,14 @@ public:
     void generation();
     void calculation();
 
-    RESULT getValuesMAX();
-    RESULT getValuesAVR();
+    const RESULT getValuesMAX() const;
+    const RESULT getValuesAVR() const;
+
+    const int getFixedPoint() const;
 
 protected:
 
-    virtual void generate(byte ** sbox);
+    virtual void generate(byte * &sbox);
     const double getValue(const oper & oper1, const oper & oper2, const byte& alfa, const byte& betta);
     const QPair<double, double> getValues(const oper & oper1, const oper & oper2);
     const byte H(const int value);
@@ -43,6 +45,7 @@ private:
 
     RESULT m_max;
     RESULT m_avr;
+    int m_fixedpoint;
 };
 
 #endif // SBOX_H

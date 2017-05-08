@@ -1,11 +1,14 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QString>
+#include <QDateTime>
 
 #include <math.h>
-#include "sboxbelt.h"
 
-#define MAX_COUNT 5
+#include "sboxbelt.h"
+#include "sboxgrig.h"
+
+#define MAX_COUNT 1000
 
 void printList(const QList<QPair<double, int>> & list, QString name){
     qDebug() << name;
@@ -14,46 +17,67 @@ void printList(const QList<QPair<double, int>> & list, QString name){
     }
 }
 
+void printList(const QList<QPair<double, int>> & list){
+    for(QPair<double, int> val : list){
+        qDebug() << QString("VALUE - %1 COUNT - %2").arg(val.first).arg(val.second);
+    }
+}
+
+void printSBox(const SBox & sbox, QString name){
+     qDebug() << QString("*** --- *** %1 *** --- ***").arg(name);
+
+     const SBox::RESULT max = sbox.getValuesMAX();
+     const SBox::RESULT avr = sbox.getValuesAVR();
+
+     qDebug() << "*** --- *** MAXIMUM *** --- ***";
+
+     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(max.plusPlus).arg(-log2(1/max.plusPlus));
+     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(max.plusMinus).arg(-log2(1/max.plusMinus));
+     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(max.plusXOR).arg(-log2(1/max.plusXOR));
+
+     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(max.minusPlus).arg(-log2(1/max.minusPlus));
+     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(max.minusMinus).arg(-log2(1/max.minusMinus));
+     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(max.minusXOR).arg(-log2(1/max.minusXOR));
+
+     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(max.xorPlus).arg(-log2(1/max.xorPlus));
+     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(max.xorMinus).arg(-log2(1/max.xorMinus));
+     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(max.xorXOR).arg(-log2(1/max.xorXOR));
+
+     qDebug() << "*** --- *** AVERAGE *** --- ***";
+
+     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(avr.plusPlus).arg(-log2(1/avr.plusPlus));
+     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(avr.plusMinus).arg(-log2(1/avr.plusMinus));
+     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(avr.plusXOR).arg(-log2(1/avr.plusXOR));
+
+     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(avr.minusPlus).arg(-log2(1/avr.minusPlus));
+     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(avr.minusMinus).arg(-log2(1/avr.minusMinus));
+     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(avr.minusXOR).arg(-log2(1/avr.minusXOR));
+
+     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(avr.xorPlus).arg(-log2(1/avr.xorPlus));
+     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(avr.xorMinus).arg(-log2(1/avr.xorMinus));
+     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(avr.xorXOR).arg(-log2(1/avr.xorXOR));
+
+     qDebug() << "*** --- *** FIXED POINT *** --- ***";
+
+     qDebug() << sbox.getFixedPoint();
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     SBoxBelT belT;
+    SBoxGrig grig;
+
     belT.generation();
+    grig.generation();
+
     belT.calculation();
+    grig.calculation();
 
-    SBox::RESULT maxBelT = belT.getValuesMAX();
-    SBox::RESULT avrBelT = belT.getValuesAVR();
+    printSBox(belT, "BelIT");
+    printSBox(grig, "Grig");
 
-    qDebug() << "*** --- *** BelIT *** --- ***";
-
-    qDebug() << "*** --- *** MAXIMUM *** --- ***";
-
-    qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(maxBelT.plusPlus).arg(-log2(1/maxBelT.plusPlus));
-    qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(maxBelT.plusMinus).arg(-log2(1/maxBelT.plusMinus));
-    qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(maxBelT.plusXOR).arg(-log2(1/maxBelT.plusXOR));
-
-    qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(maxBelT.minusPlus).arg(-log2(1/maxBelT.minusPlus));
-    qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(maxBelT.minusMinus).arg(-log2(1/maxBelT.minusMinus));
-    qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(maxBelT.minusXOR).arg(-log2(1/maxBelT.minusXOR));
-
-    qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(maxBelT.xorPlus).arg(-log2(1/maxBelT.xorPlus));
-    qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(maxBelT.xorMinus).arg(-log2(1/maxBelT.xorMinus));
-    qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(maxBelT.xorXOR).arg(-log2(1/maxBelT.xorXOR));
-
-    qDebug() << "*** --- *** AVERAGE *** --- ***";
-
-    qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(avrBelT.plusPlus).arg(-log2(1/avrBelT.plusPlus));
-    qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(avrBelT.plusMinus).arg(-log2(1/avrBelT.plusMinus));
-    qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(avrBelT.plusXOR).arg(-log2(1/avrBelT.plusXOR));
-
-    qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(avrBelT.minusPlus).arg(-log2(1/avrBelT.minusPlus));
-    qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(avrBelT.minusMinus).arg(-log2(1/avrBelT.minusMinus));
-    qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(avrBelT.minusXOR).arg(-log2(1/avrBelT.minusXOR));
-
-    qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(avrBelT.xorPlus).arg(-log2(1/avrBelT.xorPlus));
-    qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(avrBelT.xorMinus).arg(-log2(1/avrBelT.xorMinus));
-    qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(avrBelT.xorXOR).arg(-log2(1/avrBelT.xorXOR));
 
     QList<QPair<double, int>> plusplusMAX;
     QList<QPair<double, int>> plusminusMAX;
@@ -79,8 +103,14 @@ int main(int argc, char *argv[])
     QList<QPair<double, int>> xorminusAVR;
     QList<QPair<double, int>> xorxorAVR;
 
-    for(int i = 0; i < MAX_COUNT; i++){
-        qDebug() << "progress " << i;
+    QList<QPair<double, int>> fixedPoint;
+
+    qint64 start = 0;
+
+    for(int i = 1; i <= MAX_COUNT; i++){
+
+        qDebug() << QString("%1 from %2 (left %3) delta - %4 ms").arg(i).arg(MAX_COUNT).arg(MAX_COUNT - i).arg(start ? QDateTime::currentDateTime().toMSecsSinceEpoch() - start : 0);
+        start = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
         SBox sbox;
         sbox.generation();
@@ -112,6 +142,8 @@ int main(int argc, char *argv[])
         append(xorplusAVR,  avr.xorPlus);
         append(xorminusAVR, avr.xorMinus);
         append(xorxorAVR,   avr.xorXOR);
+
+        append(fixedPoint, sbox.getFixedPoint());
     }
 
     qDebug() << "*** --- *** MAXIMUM *** --- ***";
@@ -141,6 +173,10 @@ int main(int argc, char *argv[])
     printList(xorplusAVR,  "### ### XOR PLUS ");
     printList(xorminusAVR, "### ### XOR MINUS ");
     printList(xorxorAVR,   "### ### XOR XOR ");
+
+    qDebug() << "*** --- *** FIXED POINT *** --- ***";
+
+    printList(fixedPoint);
 
     return a.exec();
 }
