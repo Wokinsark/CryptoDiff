@@ -27,3 +27,14 @@ void append(QList<QPair<double, int> > &list, const double &value){
 
     list.append(QPair<double, int>{ value, 1 });
 }
+
+const byte scalar(const byte &a, const byte &b)
+{
+    byte result = 0x00;
+    byte   mult = a & b;
+    for(int i = 0; i < 8; i++){
+        result ^= (mult >> i) & 0x01;
+    }
+
+    return result;
+}

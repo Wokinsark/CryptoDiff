@@ -8,58 +8,80 @@
 #include "sboxbelt.h"
 #include "sboxgrig.h"
 
-#define MAX_COUNT 1000
+#define MAX_COUNT 10000
 
 void printList(const QList<QPair<double, int>> & list, QString name){
     qDebug() << name;
     for(QPair<double, int> val : list){
-        qDebug() << QString("VALUE - %1 (2 ^ %2) COUNT - %3").arg(val.first).arg(-log2(1/val.first)).arg(val.second);
+        qDebug() << QString("VALUE - %1 (2 ^ %2) COUNT - %3").arg(QString::number(val.first, 'f', 9)).arg(-log2(1/val.first)).arg(val.second);
     }
 }
 
 void printList(const QList<QPair<double, int>> & list){
     for(QPair<double, int> val : list){
-        qDebug() << QString("VALUE - %1 COUNT - %2").arg(val.first).arg(val.second);
+        qDebug() << QString("VALUE - %1 COUNT - %2").arg(QString::number(val.first, 'f', 9)).arg(val.second);
     }
 }
 
 void printSBox(const SBox & sbox, QString name){
      qDebug() << QString("*** --- *** %1 *** --- ***").arg(name);
 
-     const SBox::RESULT max = sbox.getValuesMAX();
-     const SBox::RESULT avr = sbox.getValuesAVR();
+     const SBox::RESULT maxP1 = sbox.getP1MAX();
+     const SBox::RESULT avrP1 = sbox.getP1AVR();
+     const int          maxP2 = sbox.getP2MAX();
+     const double       avrP2 = sbox.getP2AVR();
+     const SBox::RESULT maxP3 = sbox.getP3MAX();
 
-     qDebug() << "*** --- *** MAXIMUM *** --- ***";
+     qDebug() << "*** --- *** POINT 1 (MAXIMUM) *** --- ***";
 
-     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(max.plusPlus).arg(-log2(1/max.plusPlus));
-     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(max.plusMinus).arg(-log2(1/max.plusMinus));
-     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(max.plusXOR).arg(-log2(1/max.plusXOR));
+     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(maxP1.plusPlus).arg(-log2(1/maxP1.plusPlus));
+     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(maxP1.plusMinus).arg(-log2(1/maxP1.plusMinus));
+     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(maxP1.plusXOR).arg(-log2(1/maxP1.plusXOR));
 
-     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(max.minusPlus).arg(-log2(1/max.minusPlus));
-     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(max.minusMinus).arg(-log2(1/max.minusMinus));
-     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(max.minusXOR).arg(-log2(1/max.minusXOR));
+     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(maxP1.minusPlus).arg(-log2(1/maxP1.minusPlus));
+     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(maxP1.minusMinus).arg(-log2(1/maxP1.minusMinus));
+     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(maxP1.minusXOR).arg(-log2(1/maxP1.minusXOR));
 
-     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(max.xorPlus).arg(-log2(1/max.xorPlus));
-     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(max.xorMinus).arg(-log2(1/max.xorMinus));
-     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(max.xorXOR).arg(-log2(1/max.xorXOR));
+     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(maxP1.xorPlus).arg(-log2(1/maxP1.xorPlus));
+     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(maxP1.xorMinus).arg(-log2(1/maxP1.xorMinus));
+     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(maxP1.xorXOR).arg(-log2(1/maxP1.xorXOR));
 
-     qDebug() << "*** --- *** AVERAGE *** --- ***";
+     qDebug() << "*** --- *** POINT 1 (AVERAGE) *** --- ***";
 
-     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(avr.plusPlus).arg(-log2(1/avr.plusPlus));
-     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(avr.plusMinus).arg(-log2(1/avr.plusMinus));
-     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(avr.plusXOR).arg(-log2(1/avr.plusXOR));
+     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(avrP1.plusPlus).arg(-log2(1/avrP1.plusPlus));
+     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(avrP1.plusMinus).arg(-log2(1/avrP1.plusMinus));
+     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(avrP1.plusXOR).arg(-log2(1/avrP1.plusXOR));
 
-     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(avr.minusPlus).arg(-log2(1/avr.minusPlus));
-     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(avr.minusMinus).arg(-log2(1/avr.minusMinus));
-     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(avr.minusXOR).arg(-log2(1/avr.minusXOR));
+     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(avrP1.minusPlus).arg(-log2(1/avrP1.minusPlus));
+     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(avrP1.minusMinus).arg(-log2(1/avrP1.minusMinus));
+     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(avrP1.minusXOR).arg(-log2(1/avrP1.minusXOR));
 
-     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(avr.xorPlus).arg(-log2(1/avr.xorPlus));
-     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(avr.xorMinus).arg(-log2(1/avr.xorMinus));
-     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(avr.xorXOR).arg(-log2(1/avr.xorXOR));
+     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(avrP1.xorPlus).arg(-log2(1/avrP1.xorPlus));
+     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(avrP1.xorMinus).arg(-log2(1/avrP1.xorMinus));
+     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(avrP1.xorXOR).arg(-log2(1/avrP1.xorXOR));
 
-     qDebug() << "*** --- *** FIXED POINT *** --- ***";
+     qDebug() << "*** --- *** POINT 2 *** --- ***";
 
-     qDebug() << sbox.getFixedPoint();
+     qDebug() << "### ### MAXIMUM " << maxP2;
+     qDebug() << "### ### AVERAGE " << avrP2;
+
+     qDebug() << "*** --- *** POINT 3 (MAXIMUM) *** --- ***";
+
+     qDebug() << QString("### ### PLUS PLUS   %1 (2 ^ %2)").arg(maxP3.plusPlus).arg(-log2(1/maxP3.plusPlus));
+     qDebug() << QString("### ### PLUS MINUS  %1 (2 ^ %2)").arg(maxP3.plusMinus).arg(-log2(1/maxP3.plusMinus));
+     qDebug() << QString("### ### PLUS XOR    %1 (2 ^ %2)").arg(maxP3.plusXOR).arg(-log2(1/maxP3.plusXOR));
+
+     qDebug() << QString("### ### MINUS PLUS  %1 (2 ^ %2)").arg(maxP3.minusPlus).arg(-log2(1/maxP3.minusPlus));
+     qDebug() << QString("### ### MINUS MINUS %1 (2 ^ %2)").arg(maxP3.minusMinus).arg(-log2(1/maxP3.minusMinus));
+     qDebug() << QString("### ### MINUS XOR   %1 (2 ^ %2)").arg(maxP3.minusXOR).arg(-log2(1/maxP3.minusXOR));
+
+     qDebug() << QString("### ### XOR PLUS    %1 (2 ^ %2)").arg(maxP3.xorPlus).arg(-log2(1/maxP3.xorPlus));
+     qDebug() << QString("### ### XOR MINUS   %1 (2 ^ %2)").arg(maxP3.xorMinus).arg(-log2(1/maxP3.xorMinus));
+     qDebug() << QString("### ### XOR XOR     %1 (2 ^ %2)").arg(maxP3.xorXOR).arg(-log2(1/maxP3.xorXOR));
+
+     qDebug() << "*** --- *** POINT 4 (FIXED POINT) *** --- ***";
+
+     qDebug() << sbox.getP4();
 }
 
 int main(int argc, char *argv[])
@@ -70,40 +92,53 @@ int main(int argc, char *argv[])
     SBoxGrig grig;
 
     belT.generation();
-    grig.generation();
-
     belT.calculation();
-    grig.calculation();
-
     printSBox(belT, "BelIT");
+
+    grig.generation();
+    grig.calculation();
     printSBox(grig, "Grig");
 
+    QList<QPair<double, int>> point1PlusPlusMAX;
+    QList<QPair<double, int>> point1PlusMinusMAX;
+    QList<QPair<double, int>> point1PlusXORMAX;
 
-    QList<QPair<double, int>> plusplusMAX;
-    QList<QPair<double, int>> plusminusMAX;
-    QList<QPair<double, int>> plusxorMAX;
+    QList<QPair<double, int>> point1MinusPlusMAX;
+    QList<QPair<double, int>> point1MinusMinusMAX;
+    QList<QPair<double, int>> point1MinusXORMAX;
 
-    QList<QPair<double, int>> minusplusMAX;
-    QList<QPair<double, int>> minusminusMAX;
-    QList<QPair<double, int>> minusxorMAX;
+    QList<QPair<double, int>> point1XORPlusMAX;
+    QList<QPair<double, int>> point1XORMinusMAX;
+    QList<QPair<double, int>> point1XORXORMAX;
 
-    QList<QPair<double, int>> xorplusMAX;
-    QList<QPair<double, int>> xorminusMAX;
-    QList<QPair<double, int>> xorxorMAX;
+    QList<QPair<double, int>> point1PlusPlusAVR;
+    QList<QPair<double, int>> point1PlusMinusAVR;
+    QList<QPair<double, int>> point1PlusXORAVR;
 
-    QList<QPair<double, int>> plusplusAVR;
-    QList<QPair<double, int>> plusminusAVR;
-    QList<QPair<double, int>> plusxorAVR;
+    QList<QPair<double, int>> point1MinusPlusAVR;
+    QList<QPair<double, int>> point1MinusMinusAVR;
+    QList<QPair<double, int>> point1MinusXORAVR;
 
-    QList<QPair<double, int>> minusplusAVR;
-    QList<QPair<double, int>> minusminusAVR;
-    QList<QPair<double, int>> minusxorAVR;
+    QList<QPair<double, int>> point1XORPlusAVR;
+    QList<QPair<double, int>> point1XORMinusAVR;
+    QList<QPair<double, int>> point1XORXORAVR;
 
-    QList<QPair<double, int>> xorplusAVR;
-    QList<QPair<double, int>> xorminusAVR;
-    QList<QPair<double, int>> xorxorAVR;
+    QList<QPair<double, int>> point2MAX;
+    QList<QPair<double, int>> point2AVR;
 
-    QList<QPair<double, int>> fixedPoint;
+    QList<QPair<double, int>> point3PlusPlusMAX;
+    QList<QPair<double, int>> point3PlusMinusMAX;
+    QList<QPair<double, int>> point3PlusXORMAX;
+
+    QList<QPair<double, int>> point3MinusPlusMAX;
+    QList<QPair<double, int>> point3MinusMinusMAX;
+    QList<QPair<double, int>> point3MinusXORMAX;
+
+    QList<QPair<double, int>> point3XORPlusMAX;
+    QList<QPair<double, int>> point3XORMinusMAX;
+    QList<QPair<double, int>> point3XORXORMAX;
+
+    QList<QPair<double, int>> point4;
 
     qint64 start = 0;
 
@@ -116,67 +151,108 @@ int main(int argc, char *argv[])
         sbox.generation();
         sbox.calculation();
 
-        SBox::RESULT max = sbox.getValuesMAX();
-        SBox::RESULT avr = sbox.getValuesAVR();
+        const SBox::RESULT maxP1 = sbox.getP1MAX();
+        const SBox::RESULT avrP1 = sbox.getP1AVR();
+        const    int       maxP2 = sbox.getP2MAX();
+        const double       avrP2 = sbox.getP2AVR();
+        const SBox::RESULT maxP3 = sbox.getP3MAX();
+        const int          valP4 = sbox.getP4();
 
-        append(plusplusMAX,  max.plusPlus);
-        append(plusminusMAX, max.plusMinus);
-        append(plusxorMAX,   max.plusXOR);
+        append(point1PlusPlusMAX,  maxP1.plusPlus);
+        append(point1PlusMinusMAX, maxP1.plusMinus);
+        append(point1PlusXORMAX,   maxP1.plusXOR);
 
-        append(minusplusMAX,  max.minusPlus);
-        append(minusminusMAX, max.minusMinus);
-        append(minusxorMAX,   max.minusXOR);
+        append(point1MinusPlusMAX,  maxP1.minusPlus);
+        append(point1MinusMinusMAX, maxP1.minusMinus);
+        append(point1MinusXORMAX,   maxP1.minusXOR);
 
-        append(xorplusMAX,  max.xorPlus);
-        append(xorminusMAX, max.xorMinus);
-        append(xorxorMAX,   max.xorXOR);
+        append(point1XORPlusMAX,  maxP1.xorPlus);
+        append(point1XORMinusMAX, maxP1.xorMinus);
+        append(point1XORXORMAX,   maxP1.xorXOR);
 
-        append(plusplusAVR,  avr.plusPlus);
-        append(plusminusAVR, avr.plusMinus);
-        append(plusxorAVR,   avr.plusXOR);
+        append(point1PlusPlusAVR,  avrP1.plusPlus);
+        append(point1PlusMinusAVR, avrP1.plusMinus);
+        append(point1PlusXORAVR,   avrP1.plusXOR);
 
-        append(minusplusAVR,  avr.minusPlus);
-        append(minusminusAVR, avr.minusMinus);
-        append(minusxorAVR,   avr.minusXOR);
+        append(point1MinusPlusAVR,  avrP1.minusPlus);
+        append(point1MinusMinusAVR, avrP1.minusMinus);
+        append(point1MinusXORAVR,   avrP1.minusXOR);
 
-        append(xorplusAVR,  avr.xorPlus);
-        append(xorminusAVR, avr.xorMinus);
-        append(xorxorAVR,   avr.xorXOR);
+        append(point1XORPlusAVR,  avrP1.xorPlus);
+        append(point1XORMinusAVR, avrP1.xorMinus);
+        append(point1XORXORAVR,   avrP1.xorXOR);
 
-        append(fixedPoint, sbox.getFixedPoint());
+        append(point2MAX, maxP2);
+        append(point2AVR, avrP2);
+
+        append(point3PlusPlusMAX,  maxP3.plusPlus);
+        append(point3PlusMinusMAX, maxP3.plusMinus);
+        append(point3PlusXORMAX,   maxP3.plusXOR);
+
+        append(point3MinusPlusMAX,  maxP3.minusPlus);
+        append(point3MinusMinusMAX, maxP3.minusMinus);
+        append(point3MinusXORMAX,   maxP3.minusXOR);
+
+        append(point3XORPlusMAX,  maxP3.xorPlus);
+        append(point3XORMinusMAX, maxP3.xorMinus);
+        append(point3XORXORMAX,   maxP3.xorXOR);
+
+        append(point4, valP4);
     }
 
-    qDebug() << "*** --- *** MAXIMUM *** --- ***";
+    qDebug() << "*** --- *** POINT 1 (MAXIMUM) *** --- ***";
 
-    printList(plusplusMAX,  "### ### PLUS PLUS ");
-    printList(plusminusMAX, "### ### PLUS MINUS ");
-    printList(plusxorMAX,   "### ### PLUS XOR ");
+    printList(point1PlusPlusMAX,  "### ### PLUS PLUS ");
+    printList(point1PlusMinusMAX, "### ### PLUS MINUS ");
+    printList(point1PlusXORMAX,   "### ### PLUS XOR ");
 
-    printList(minusplusMAX,  "### ### MINUS PLUS ");
-    printList(minusminusMAX, "### ### MINUS MINUS ");
-    printList(minusxorMAX,   "### ### MINUS XOR ");
+    printList(point1MinusPlusMAX,  "### ### MINUS PLUS ");
+    printList(point1MinusMinusMAX, "### ### MINUS MINUS ");
+    printList(point1MinusXORMAX,   "### ### MINUS XOR ");
 
-    printList(xorplusMAX,  "### ### XOR PLUS ");
-    printList(xorminusMAX, "### ### XOR MINUS ");
-    printList(xorxorMAX,   "### ### XOR XOR ");
+    printList(point1XORPlusMAX,  "### ### XOR PLUS ");
+    printList(point1XORMinusMAX, "### ### XOR MINUS ");
+    printList(point1XORXORMAX,   "### ### XOR XOR ");
 
-    qDebug() << "*** --- *** AVERAGE *** --- ***";
+    qDebug() << "*** --- *** POINT 1 (AVERAGE) *** --- ***";
 
-    printList(plusplusAVR,  "### ### PLUS PLUS ");
-    printList(plusminusAVR, "### ### PLUS MINUS ");
-    printList(plusxorAVR,   "### ### PLUS XOR ");
+    printList(point1PlusPlusAVR,  "### ### PLUS PLUS ");
+    printList(point1PlusMinusAVR, "### ### PLUS MINUS ");
+    printList(point1PlusXORAVR,   "### ### PLUS XOR ");
 
-    printList(minusplusAVR,  "### ### MINUS PLUS ");
-    printList(minusminusAVR, "### ### MINUS MINUS ");
-    printList(minusxorAVR,   "### ### MINUS XOR ");
+    printList(point1MinusPlusAVR,  "### ### MINUS PLUS ");
+    printList(point1MinusMinusAVR, "### ### MINUS MINUS ");
+    printList(point1MinusXORAVR,   "### ### MINUS XOR ");
 
-    printList(xorplusAVR,  "### ### XOR PLUS ");
-    printList(xorminusAVR, "### ### XOR MINUS ");
-    printList(xorxorAVR,   "### ### XOR XOR ");
+    printList(point1XORPlusAVR,  "### ### XOR PLUS ");
+    printList(point1XORMinusAVR, "### ### XOR MINUS ");
+    printList(point1XORXORAVR,   "### ### XOR XOR ");
 
-    qDebug() << "*** --- *** FIXED POINT *** --- ***";
+    qDebug() << "*** --- *** POINT 2 (MAXIMUM) *** --- ***";
 
-    printList(fixedPoint);
+    printList(point2MAX);
+
+    qDebug() << "*** --- *** POINT 2 (AVERAGE) *** --- ***";
+
+    printList(point2AVR);
+
+    qDebug() << "*** --- *** POINT 3 (MAXIMUM) *** --- ***";
+
+    printList(point3PlusPlusMAX,  "### ### PLUS PLUS ");
+    printList(point3PlusMinusMAX, "### ### PLUS MINUS ");
+    printList(point3PlusXORMAX,   "### ### PLUS XOR ");
+
+    printList(point3MinusPlusMAX,  "### ### MINUS PLUS ");
+    printList(point3MinusMinusMAX, "### ### MINUS MINUS ");
+    printList(point3MinusXORMAX,   "### ### MINUS XOR ");
+
+    printList(point3XORPlusMAX,  "### ### XOR PLUS ");
+    printList(point3XORMinusMAX, "### ### XOR MINUS ");
+    printList(point3XORXORMAX,   "### ### XOR XOR ");
+
+    qDebug() << "*** --- *** POINT 4 (FIXED POINT) *** --- ***";
+
+    printList(point4);
 
     return a.exec();
 }

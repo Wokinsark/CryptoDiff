@@ -7,7 +7,12 @@
 typedef unsigned char byte;
 typedef const byte (*oper)(const byte& alfa, const byte& betta);
 
-#define CONST 0.00390625 // 1/(2^8)
+#define CONST            0.00390625 // 1/(2^8)
+#define COUNT_ALFA_BETTA 65025.0    // alfa in [1, 255] and betta in [1, 255] => 255 * 255
+#define MIN_ALFA         1
+#define MIN_BETTA        1
+#define MAX_ALFA         255
+#define MAX_BETTA        255
 
 constexpr byte sboxBelT[256] = {
     0xB1, 0x94, 0xBA, 0xC8, 0x0A, 0x08, 0xF5, 0x3B, 0x36, 0x6D, 0x00, 0x8E, 0x58, 0x4A, 0x5D, 0xE4,
@@ -52,6 +57,8 @@ const byte plus(const byte& a, const byte& b);
 const byte minus(const byte& a, const byte& b);
 
 const byte XOR(const byte& a, const byte& b);
+
+const byte scalar(const byte& a, const byte& b);
 
 const bool isEqual(const byte& a, const byte& b);
 
